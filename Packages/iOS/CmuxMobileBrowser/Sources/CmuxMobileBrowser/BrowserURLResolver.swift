@@ -1,3 +1,4 @@
+import CmuxURLEncoding
 public import Foundation
 
 /// Turns whatever a user types in the address bar into a loadable `URL`.
@@ -125,7 +126,7 @@ public struct BrowserURLResolver: Sendable {
 
     private func isWebURL(_ input: String) -> Bool {
         guard hasWhitespaceFreeAuthority(in: input),
-              let components = URLComponents(string: input),
+              let components = parsedComponents(input),
               let scheme = components.scheme?.lowercased(),
               scheme == "http" || scheme == "https",
               let host = components.host,
@@ -133,6 +134,18 @@ public struct BrowserURLResolver: Sendable {
             return false
         }
         return true
+    }
+
+    /// Parses URL text into components without encoding its existing `%XX`
+    /// escapes again.
+    ///
+    /// Foundation encodes a component holding raw Unicode as if none of it
+    /// were encoded, so `%2F` beside Japanese text became `%252F`.
+    /// `URLEscapePreservingEncoder` encodes what needs it first, the way a
+    /// browser does. It leaves the authority as written, so the host checks
+    /// below see the host the user typed.
+    private func parsedComponents(_ text: String) -> URLComponents? {
+        URLComponents(string: URLEscapePreservingEncoder().encode(text))
     }
 
     /// Rejects whitespace that Foundation would otherwise encode inside URL userinfo.
@@ -181,7 +194,7 @@ public struct BrowserURLResolver: Sendable {
     /// no userinfo, and a host equal to the text's authority host. This keeps
     /// any parser disagreement from silently redirecting to another host.
     private func schemeLessURL(scheme: String, authorityText: String) -> URL? {
-        guard let components = URLComponents(string: "\(scheme)://\(authorityText)"),
+        guard let components = parsedComponents("\(scheme)://\(authorityText)"),
               components.percentEncodedUser == nil,
               components.percentEncodedPassword == nil,
               let host = components.percentEncodedHost,
@@ -194,7 +207,7 @@ public struct BrowserURLResolver: Sendable {
 
     private func isSchemeLessHostWithStructure(_ input: String) -> Bool {
         guard !input.contains("://"),
-              let components = URLComponents(string: "https://\(input)"),
+              let components = parsedComponents("https://\(input)"),
               let host = components.host,
               !host.isEmpty else {
             return false
@@ -261,7 +274,7 @@ public struct BrowserURLResolver: Sendable {
     /// `file:` or `javascript:` cannot be loaded from the address bar.
     private func schemedURL(from input: String) -> URL? {
         guard hasWhitespaceFreeAuthority(in: input),
-              let components = URLComponents(string: input),
+              let components = parsedComponents(input),
               let scheme = components.scheme?.lowercased() else {
             return nil
         }
