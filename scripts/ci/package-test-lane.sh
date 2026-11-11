@@ -148,6 +148,7 @@ select_packages() {
     CmuxControlSocket
     CmuxFoundation
     CmuxGit
+    CmuxMobileBrowser
     CmuxMobileTerminalKit
     CmuxMobileWorkspace
     CmuxNotifications
