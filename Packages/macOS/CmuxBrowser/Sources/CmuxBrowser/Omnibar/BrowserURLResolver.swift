@@ -1,4 +1,4 @@
-import CmuxFoundation
+import CmuxURLEncoding
 public import Foundation
 
 /// Resolves macOS browser omnibar text into a URL that can be loaded directly.

@@ -1,4 +1,4 @@
-import CmuxFoundation
+import CmuxURLEncoding
 import Foundation
 #if DEBUG
 import CMUXDebugLog

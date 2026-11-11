@@ -188,6 +188,7 @@ select_packages() {
     CmuxUpdaterUI
     CmuxWindowing
     CmuxTextActions
+    CmuxURLEncoding
   )
 
   changed="$work/changed-files.txt"

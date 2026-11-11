@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import CmuxFoundation
+@testable import CmuxURLEncoding
 
 /// Covers ``URLEscapePreservingEncoder``: browser-style encoding of URL text
 /// that keeps the `%XX` escapes it already has (manaflow-ai/cmux#40300).
