@@ -151,6 +151,18 @@ private struct StubHostNormalizer: BrowserHostNormalizing {
         #expect(url.absoluteString == "obsidian://open?vault=%E3%83%A1%E3%83%A2&file=2026%2F11%2F5")
     }
 
+    /// Scheme-less text the browser cannot navigate resolves exactly as
+    /// Foundation parses it as written. Encoding it first changes whether
+    /// Foundation parses it at all, so terminal output such as
+    /// `エラー:見つかりません` became a link on one Foundation and
+    /// `[javascript:本^` stopped being one on another. The expectation is
+    /// Foundation's own answer because that answer differs between OS versions.
+    @Test func schemeLessTextTheBrowserCannotNavigateResolvesAsWritten() {
+        for text in ["エラー:見つかりません", "日本語:8080", "[javascript:本^"] {
+            #expect(router.resolveOpenURLTarget(text)?.url == URL(string: text), "\(text)")
+        }
+    }
+
     @Test func emptyTextResolvesToNil() {
         #expect(router.resolveOpenURLTarget("") == nil)
         #expect(router.resolveOpenURLTarget("   \n") == nil)

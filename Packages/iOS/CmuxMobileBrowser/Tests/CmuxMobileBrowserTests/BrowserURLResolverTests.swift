@@ -101,6 +101,20 @@ import Testing
         )
     }
 
+    /// A wrapped scheme-less URL still loads when its kept escapes are not
+    /// UTF-8 (a Shift-JIS path or query). The decoded path and query of such
+    /// a URL are empty, so wrap removal must judge the encoded components.
+    @Test func wrappedSchemeLessURLWithNonUTF8EscapesStillLoads() {
+        #expect(
+            BrowserURLResolver.resolve("example.com/\n%93%FA%96%7B日本")?.absoluteString ==
+                "https://example.com/%93%FA%96%7B%E6%97%A5%E6%9C%AC"
+        )
+        #expect(
+            BrowserURLResolver.resolve("example.com?\nq=%93%FA日本")?.absoluteString ==
+                "https://example.com?q=%93%FA%E6%97%A5%E6%9C%AC"
+        )
+    }
+
     @Test func surroundingWhitespaceDoesNotRewriteOAuthURL() {
         let url = BrowserURLResolver.resolve("  \n\t\(oauthURL)\r\n  ")
 
