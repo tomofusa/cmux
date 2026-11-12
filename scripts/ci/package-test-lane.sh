@@ -148,6 +148,7 @@ select_packages() {
     CmuxControlSocket
     CmuxFoundation
     CmuxGit
+    CmuxMobileBrowser
     CmuxMobileTerminalKit
     CmuxMobileWorkspace
     CmuxNotifications
@@ -188,6 +189,7 @@ select_packages() {
     CmuxUpdaterUI
     CmuxWindowing
     CmuxTextActions
+    CmuxURLEncoding
   )
 
   changed="$work/changed-files.txt"

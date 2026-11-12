@@ -66,6 +66,55 @@ import Testing
         #expect(BrowserURLResolver.resolve("go\nexample.com/path")?.host == "duckduckgo.com")
     }
 
+    /// Foundation encodes a URL component that holds raw Unicode as if none of
+    /// it were encoded yet, so a `%2F` beside Japanese text used to load as
+    /// `%252F` (manaflow-ai/cmux#40300). Browsers keep it.
+    @Test func percentEscapesNextToRawUnicodeAreKept() {
+        #expect(
+            BrowserURLResolver.resolve("https://scrapbox.io/p/会議メモ_2026%2F11%2F5")?.absoluteString ==
+                "https://scrapbox.io/p/%E4%BC%9A%E8%AD%B0%E3%83%A1%E3%83%A2_2026%2F11%2F5"
+        )
+        #expect(
+            BrowserURLResolver.resolve("scrapbox.io/p/会議メモ_2026%2F11%2F5")?.absoluteString ==
+                "https://scrapbox.io/p/%E4%BC%9A%E8%AD%B0%E3%83%A1%E3%83%A2_2026%2F11%2F5"
+        )
+        #expect(
+            BrowserURLResolver.resolve("https://example.com/search?q=日本 語&next=a%2Fb")?.absoluteString ==
+                "https://example.com/search?q=%E6%97%A5%E6%9C%AC%20%E8%AA%9E&next=a%2Fb"
+        )
+    }
+
+    /// Keeping escapes must not leave raw what a URL can't carry: a stray `%`,
+    /// a `|` or a second `#` beside raw Unicode is still encoded.
+    @Test func charactersURLsCannotCarryNextToRawUnicodeAreStillEncoded() {
+        #expect(
+            BrowserURLResolver.resolve("https://example.com/日本100%")?.absoluteString ==
+                "https://example.com/%E6%97%A5%E6%9C%AC100%25"
+        )
+        #expect(
+            BrowserURLResolver.resolve("https://example.com/メモ|a")?.absoluteString ==
+                "https://example.com/%E3%83%A1%E3%83%A2%7Ca"
+        )
+        #expect(
+            BrowserURLResolver.resolve("https://example.com/a#メモ#b")?.absoluteString ==
+                "https://example.com/a#%E3%83%A1%E3%83%A2%23b"
+        )
+    }
+
+    /// A wrapped scheme-less URL still loads when its kept escapes are not
+    /// UTF-8 (a Shift-JIS path or query). The decoded path and query of such
+    /// a URL are empty, so wrap removal must judge the encoded components.
+    @Test func wrappedSchemeLessURLWithNonUTF8EscapesStillLoads() {
+        #expect(
+            BrowserURLResolver.resolve("example.com/\n%93%FA%96%7B日本")?.absoluteString ==
+                "https://example.com/%93%FA%96%7B%E6%97%A5%E6%9C%AC"
+        )
+        #expect(
+            BrowserURLResolver.resolve("example.com?\nq=%93%FA日本")?.absoluteString ==
+                "https://example.com?q=%93%FA%E6%97%A5%E6%9C%AC"
+        )
+    }
+
     @Test func surroundingWhitespaceDoesNotRewriteOAuthURL() {
         let url = BrowserURLResolver.resolve("  \n\t\(oauthURL)\r\n  ")
 

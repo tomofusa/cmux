@@ -17,6 +17,7 @@ let package = Package(
         .package(path: "../CmuxFoundation"),
         .package(path: "../CMUXDebugLog"),
         .package(path: "../CmuxSettings"),
+        .package(path: "../../Shared/CmuxURLEncoding"),
         .package(path: "../../../vendor/bonsplit"),
     ],
     targets: [
@@ -26,6 +27,7 @@ let package = Package(
                 "CmuxFoundation",
                 "CMUXDebugLog",
                 "CmuxSettings",
+                "CmuxURLEncoding",
                 .product(name: "Bonsplit", package: "bonsplit"),
             ],
             resources: [

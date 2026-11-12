@@ -71,6 +71,9 @@
          location = "group:CmuxTerminalSizing">
       </FileRef>
       <FileRef
+         location = "group:CmuxURLEncoding">
+      </FileRef>
+      <FileRef
          location = "group:CmuxWorkspacePresence">
       </FileRef>
    </Group>

@@ -17,6 +17,7 @@ let package = Package(
         .package(path: "../CmuxFoundation"),
         .package(path: "../CMUXDebugLog"),
         .package(path: "../../Shared/CmuxGhosttyKit"),
+        .package(path: "../../Shared/CmuxURLEncoding"),
     ],
     targets: [
         .target(
@@ -29,6 +30,7 @@ let package = Package(
                 .product(name: "CmuxGhosttyKit", package: "CmuxGhosttyKit"),
                 .product(name: "CmuxFoundation", package: "CmuxFoundation"),
                 .product(name: "CMUXDebugLog", package: "CMUXDebugLog"),
+                .product(name: "CmuxURLEncoding", package: "CmuxURLEncoding"),
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
