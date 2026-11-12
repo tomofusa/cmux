@@ -73,9 +73,13 @@ public struct TerminalLinkRouter: Sendable {
             return .embeddedBrowser(webURL)
         }
 
-        // Encode what the link can't carry first, so an existing `%2F` beside
-        // raw Unicode isn't encoded again to `%252F`.
-        let urlText = URLEscapePreservingEncoder().encode(trimmed)
+        // Encode what a link with a scheme can't carry first, so an existing
+        // `%2F` beside raw Unicode isn't encoded again to `%252F`. Scheme-less
+        // text stays as written: encoding it changes whether Foundation
+        // parses it at all, so text that named nothing would become a link.
+        let urlText = Self.hasExplicitScheme(trimmed)
+            ? URLEscapePreservingEncoder().encode(trimmed)
+            : trimmed
         if let parsed = URL(string: urlText),
            let scheme = parsed.scheme?.lowercased() {
             if scheme == "http" || scheme == "https" {
